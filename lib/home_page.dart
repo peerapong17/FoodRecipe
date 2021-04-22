@@ -26,11 +26,7 @@ class _HomePageState extends State<HomePage> {
 
       jsonData['hits'].forEach(
         (data) {
-          FoodModel foodData = FoodModel(
-            label: data['recipe']['label'],
-            image: data['recipe']['image'],
-            url: data['recipe']['url'],
-          );
+          FoodModel foodData = FoodModel.fromJson(data['recipe']);
           foodList.add(foodData);
         },
       );

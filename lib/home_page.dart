@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:food_search/web_view.dart';
+import 'package:food_search/ListTile/recipe_tile.dart';
+import 'package:food_search/ListTile/web_view.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
-
-import 'food_model.dart';
+import 'package:get/get.dart';
+import 'model/food_model.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -38,21 +39,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          Container(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  colors: [
-                    Color(0xff292929),
-                    Color(0xff4a4a4a),
-                    Color(0xff545454),
-                    Color(0xff5c5c5c)
-                  ],
-                  begin: FractionalOffset.bottomLeft,
-                  end: FractionalOffset.topRight),
-            ),
-          ),
+          graDient(context),
           SingleChildScrollView(
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
@@ -98,64 +85,7 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(
                     height: 30,
                   ),
-                  Container(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: TextField(
-                            controller: textEditingController,
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                            decoration: InputDecoration(
-                              hintText: "Enter Ingridients",
-                              hintStyle: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white.withOpacity(0.3),
-                                  fontFamily: 'Overpass'),
-                              enabledBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              focusedBorder: UnderlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 16,
-                        ),
-                        InkWell(
-                          onTap: () {
-                            if (textEditingController.text.isNotEmpty &&
-                                textEditingController.text != null) {
-                              fetchData(textEditingController.text);
-                            }
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                gradient: LinearGradient(
-                                    colors: [
-                                      Color(0xffff2600),
-                                      Color(0xffff9d00)
-                                    ],
-                                    begin: FractionalOffset.topRight,
-                                    end: FractionalOffset.bottomLeft)),
-                            padding: EdgeInsets.all(8),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(Icons.search,
-                                    size: 18, color: Colors.white),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  searchBar(),
                   SizedBox(
                     height: 30,
                   ),
@@ -190,72 +120,81 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-}
 
-class RecipieTile extends StatefulWidget {
-  final String title, imgUrl, url;
+  Container graDient(BuildContext context) {
+    return Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+                colors: [
+                  Color(0xff292929),
+                  Color(0xff4a4a4a),
+                  Color(0xff545454),
+                  Color(0xff5c5c5c)
+                ],
+                begin: FractionalOffset.bottomLeft,
+                end: FractionalOffset.topRight),
+          ),
+        );
+  }
 
-  RecipieTile({this.title, this.imgUrl, this.url});
-
-  @override
-  _RecipieTileState createState() => _RecipieTileState();
-}
-
-class _RecipieTileState extends State<RecipieTile> {
-  @override
-  Widget build(BuildContext context) {
-    return Wrap(
-      children: <Widget>[
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RecipeView(
-                  postUrl: widget.url,
+  Container searchBar() {
+    return Container(
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: TextField(
+              controller: textEditingController,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+              decoration: InputDecoration(
+                hintText: "Enter Ingridients",
+                hintStyle: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white.withOpacity(0.3),
+                    fontFamily: 'Overpass'),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.white),
                 ),
               ),
-            );
-          },
-          child: Container(
-            margin: EdgeInsets.all(8),
-            child: Stack(
-              children: <Widget>[
-                Image.network(
-                  widget.imgUrl,
-                  height: 200,
-                  width: 200,
-                  fit: BoxFit.cover,
-                ),
-                Container(
-                  width: 200,
-                  alignment: Alignment.bottomLeft,
-                  decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: [Colors.white30, Colors.white],
-                          begin: FractionalOffset.centerRight,
-                          end: FractionalOffset.centerLeft)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          widget.title,
-                          style: TextStyle(
-                              fontSize: 13,
-                              color: Colors.black54,
-                              fontFamily: 'Overpass'),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
             ),
           ),
-        ),
-      ],
+          SizedBox(
+            width: 16,
+          ),
+          InkWell(
+            onTap: () {
+              if (textEditingController.text.isNotEmpty &&
+                  textEditingController.text != null) {
+                fetchData(textEditingController.text);
+              }
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: LinearGradient(
+                      colors: [Color(0xffff2600), Color(0xffff9d00)],
+                      begin: FractionalOffset.topRight,
+                      end: FractionalOffset.bottomLeft)),
+              padding: EdgeInsets.all(8),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(Icons.search, size: 18, color: Colors.white),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
+
+

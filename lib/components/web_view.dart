@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class RecipeView extends StatefulWidget {
-  var postUrl;
-  RecipeView({this.postUrl});
+  RecipeView({required this.postUrl});
+  final String postUrl;
 
   @override
   _RecipeViewState createState() => _RecipeViewState();

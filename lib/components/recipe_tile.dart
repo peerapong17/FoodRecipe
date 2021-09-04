@@ -1,36 +1,45 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:food_search/ListTile/web_view.dart';
-import 'package:get/get.dart';
+import 'package:food_search/components/web_view.dart';
 
-class RecipieTile extends StatefulWidget {
-  final String title, imgUrl, url;
+class FoodListTile extends StatefulWidget {
+  final String? title, image, url;
 
-  RecipieTile({this.title, this.imgUrl, this.url});
+  FoodListTile({this.title, this.image, this.url});
 
   @override
-  _RecipieTileState createState() => _RecipieTileState();
+  _FoodListTileState createState() => _FoodListTileState();
 }
 
-class _RecipieTileState extends State<RecipieTile> {
+class _FoodListTileState extends State<FoodListTile> {
+  String noImageFound =
+      "https://lh3.googleusercontent.com/proxy/h-DAiiuIbtxpp6P41fno-TVHsgmeMzXVeC7w-h2qoYHeDSytCSIhSPOHjlBsiuX_jMJRcs4G1AlLAfZwN7JcXALXbdxccIJlrLTUV8TdtoxyQ50FBTDYX1zP9kPrYlboVSM";
+
   @override
   Widget build(BuildContext context) {
     return Wrap(
       children: <Widget>[
         GestureDetector(
-          onTap: () {
-            Get.to(
-              RecipeView(
-                postUrl: widget.url,
-              ),
-            );
-          },
+          onTap: widget.url != null
+              ? () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) {
+                        return RecipeView(
+                          postUrl: widget.url!,
+                        );
+                      },
+                    ),
+                  );
+                }
+              : () {},
           child: Container(
             margin: EdgeInsets.all(8),
             child: Stack(
               children: <Widget>[
                 Image.network(
-                  widget.imgUrl,
+                  widget.image ?? noImageFound,
                   height: 200,
                   width: 200,
                   fit: BoxFit.cover,
@@ -49,7 +58,7 @@ class _RecipieTileState extends State<RecipieTile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         Text(
-                          widget.title,
+                          widget.title ?? "No Title",
                           style: TextStyle(
                               fontSize: 13,
                               color: Colors.black54,

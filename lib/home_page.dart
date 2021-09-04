@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:food_search/ListTile/recipe_tile.dart';
-import 'package:food_search/ListTile/web_view.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert' as convert;
-import 'package:get/get.dart';
-import 'model/food_model.dart';
+import 'package:food_search/services/food_service.dart';
+import 'components/gradient_background.dart';
+import 'components/recipe_tile.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,34 +9,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List<FoodModel> foodList = [];
-  var jsonResponse;
+  FoodService foodService = new FoodService();
   TextEditingController textEditingController = TextEditingController();
-
-  fetchData(search) async {
-    var url = Uri.parse(
-        "https://api.edamam.com/search?q=$search&app_id=a5b396f7&app_key=c77396450747c8e39124fa88269218f9");
-
-    var response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> jsonData = convert.jsonDecode(response.body);
-
-      jsonData['hits'].forEach(
-        (data) {
-          FoodModel foodData = FoodModel.fromJson(data['recipe']);
-          foodList.add(foodData);
-        },
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          graDient(context),
+          gradient(context),
           SingleChildScrollView(
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
@@ -91,26 +69,54 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Container(
                     child: GridView(
-                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          mainAxisSpacing: 50.0,
-                          crossAxisSpacing: 10.0,
-                          maxCrossAxisExtent: 200.0),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.vertical,
-                      physics: ClampingScrollPhysics(),
-                      children: List.generate(
-                        foodList.length,
-                        (index) {
-                          return GridTile(
-                            child: RecipieTile(
-                              title: foodList[index].label,
-                              imgUrl: foodList[index].image,
-                              url: foodList[index].url,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                            mainAxisSpacing: 50.0,
+                            crossAxisSpacing: 10.0,
+                            maxCrossAxisExtent: 200.0),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        physics: ClampingScrollPhysics(),
+                        children: [
+                          ...foodService.foodList.map(
+                            (food) {
+                              return GridTile(
+                                child: FoodListTile(
+                                  title: food.label,
+                                  image: food.image,
+                                  url: food.url,
+                                ),
+                              );
+                            },
+                          ),
+                        ]
+                        // children: List.generate(
+                        //   foodList.length,
+                        //   (index) {
+                        //     return GridTile(
+                        //       child: RecipieTile(
+                        //         title: foodList[index].label,
+                        //         imgUrl: foodList[index].image,
+                        //         url: foodList[index].url,
+                        //       ),
+                        //     );
+                        //   },
+                        // ),
+
+                        // children: [
+                        //   ListView.builder(
+                        //     itemCount: foodList.length,
+                        //     itemBuilder: (context, index) {
+                        //       return GridTile(
+                        //         child: RecipieTile(
+                        //           title: foodList[index].label,
+                        //           imgUrl: foodList[index].image,
+                        //           url: foodList[index].url,
+                        //         ),
+                        //       );
+                        //     },
+                        //   ),
+                        // ],
+                        ),
                   ),
                 ],
               ),
@@ -119,24 +125,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-  }
-
-  Container graDient(BuildContext context) {
-    return Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-                colors: [
-                  Color(0xff292929),
-                  Color(0xff4a4a4a),
-                  Color(0xff545454),
-                  Color(0xff5c5c5c)
-                ],
-                begin: FractionalOffset.bottomLeft,
-                end: FractionalOffset.topRight),
-          ),
-        );
   }
 
   Container searchBar() {
@@ -169,10 +157,11 @@ class _HomePageState extends State<HomePage> {
             width: 16,
           ),
           InkWell(
-            onTap: () {
-              if (textEditingController.text.isNotEmpty &&
-                  textEditingController.text != null) {
-                fetchData(textEditingController.text);
+            onTap: () async {
+              if (textEditingController.text.trim().isNotEmpty &&
+                  textEditingController.text.trim() != '') {
+                await foodService.fetchData(textEditingController.text);
+                setState(() {});
               }
             },
             child: Container(
@@ -196,5 +185,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
